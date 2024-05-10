@@ -1,20 +1,19 @@
 #include <tchar.h>
-#include<iostream>
 #include<errno.h>
 #include<fileapi.h>
 #include<windows.h>
-#include<string.h>
 #include"infocollector.h"
 
+extern int addinfo(Node* node);
 
 void fill_file_size(Node* node,const WIN32_FILE_ATTRIBUTE_DATA& fs_info)
 {  
   DWORD64 full_size = fs_info.nFileSizeHigh;
-  // get upper 32 bits
+  // Верхние 2 байта
   full_size = full_size << 32;
-  // get lower 32 bits
+  // Нижние 2 байта
   full_size |= fs_info.nFileSizeLow;
-  // fill node info
+  // Сохранить в node
   node->sz = full_size;
 }
 
@@ -24,7 +23,7 @@ fill_file_system_info(const WIN32_FILE_ATTRIBUTE_DATA& fs_info)
   ;
 }
 
-// resolves windows encoding problems
+// Исправления проблем с кодировкой
 LPCWSTR 
 fix_windows_encoding_problems(const std::string &string_ascii)
 {
@@ -37,16 +36,15 @@ fix_windows_encoding_problems(const std::string &string_ascii)
   return string_unicode;
 }
 
-// Executes type, size, part of the full-size on disk
-// stores it then inits the AI analyzing-process for file
-// stores the result of analyze in ???...???
+// Извлекает всю необходимую информацию о файле,
+// затем сохраняет в node
 int processfile(const std::string &file_path)
 {
 
   if (file_path.size() > MAX_PATH){
     return -1;
   }
-  // Checks type and stores it as an input to AI   
+  // Получить метаданные о файле 
   WIN32_FILE_ATTRIBUTE_DATA fs_info;
   if ((GetFileAttributesEx(fix_windows_encoding_problems(file_path),
                             GetFileExInfoStandard,
@@ -54,11 +52,11 @@ int processfile(const std::string &file_path)
   {
     return -1;
   }
-  // creates Node for file and puts info into it
+  // Создать node и cохранить метаданные
   Node *current_node = new Node(file_path);
   fill_file_size(current_node,fs_info);
   
-  // add info to collector
+  // Добавить node к общему списку
   if (addinfo(current_node) < 0){
     return -1;
   }

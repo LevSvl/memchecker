@@ -1,14 +1,16 @@
 #include<dirent.h>
 #include<errno.h>
-#include<stdlib.h>
 
 #include"infocollector.h"
 
 #define CURRENT_DIR "."
 #define PARENT_DIR ".."
 
-int scandir(const std::string &path);
+extern int scandir(const std::string &path);
+
+extern void showinfo();
 extern int processfile(const std::string &);
+extern int vis_init();
 
 int scanrun(const std::string &path)
 {
@@ -16,8 +18,7 @@ int scanrun(const std::string &path)
     return -1;
   }
   showinfo();
-  std::cout << RUNCOMMAND << std::endl;
-  system(RUNCOMMAND);
+  vis_init();
   return 0;
 }
 
@@ -28,7 +29,6 @@ scandir(const std::string &path)
   DIR *dirptr;
   dirptr = ::opendir(path.c_str());
   
-  // Some problems or path is not a directory
   if (!dirptr){
     switch (errno)
     {
@@ -36,24 +36,26 @@ scandir(const std::string &path)
     case ETXTBSY:
     case EACCES:
     case EPERM:
-      // Save permission info and return success
-      // return 0;
+      // todo: 
+      // Сохранить информацию о правах
+      // и продолжить выполнение
       perror("opendir: No accsess to dir");
       exit(1);
       break;
 
     case EAGAIN:
-      // try to scandir again?
+      // todo:
+      // Возможно, стоит как-то обработать
       perror("opendir: Try to open dir again");
       exit(1);
-      //break;
 
     case ENOENT:
+      // Ошибка имени файла или директории
       perror("opendir: Path does not exist or could not be read");
       return -1;
 
     case ENOTDIR:
-      // ok, its file
+      // Это файл, обработать файл
       if (processfile(path) < 0){
         perror("Error during the file processing");
         return -1;
@@ -65,9 +67,14 @@ scandir(const std::string &path)
       return -1;
     }
   }
+
+  // Для сканируемой папки рекурсивно
+  // просканировать вложенные файлы и папки.
+  // Папки текущей и родительской директорий
+  // не сканировать не нужно.
   std::string childdirname;
   struct dirent *entry;
-  // HERE
+
   while ((entry = ::readdir(dirptr))) {
     childdirname = entry->d_name;
     if (childdirname.compare(CURRENT_DIR) == 0){
@@ -76,9 +83,10 @@ scandir(const std::string &path)
     else if (childdirname.compare(PARENT_DIR) == 0){
       continue;
     }
+
     std::string filepath = std::string(path + "/" + childdirname);
     if (scandir(filepath) < 0){
-      // return -1;
+      return -1;
       ;
     }
   }

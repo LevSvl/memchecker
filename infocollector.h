@@ -1,11 +1,6 @@
 #pragma once
 #include<iostream>
 
-
-
-#define DIRID 1
-#define FILEID 2
-
 struct Node{
   int nodeid;
   std::string fpath;
@@ -23,9 +18,3 @@ struct Infocollector
 
   Infocollector();
 };
-
-// defs 
-//  processfile.cpp
-int addinfo(Node* node);
-//  scanrun.cpp
-void showinfo();

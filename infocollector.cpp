@@ -1,4 +1,5 @@
 #include"infocollector.h"
+// Голова связного списка узлов
 Infocollector* headcollector = new(Infocollector);
 
 Infocollector::Infocollector()
@@ -12,7 +13,7 @@ Node::Node(std::string fpath)
   Node::fpath = fpath;
 }
 
-// put at the end
+// Добавить узел в конец списка
 int addinfo(Node* node)
 {
   Infocollector *p = headcollector;
@@ -32,7 +33,7 @@ int addinfo(Node* node)
   return 0;
 }
 
-// shows nodes info in cycle 
+// Вывести информацию о каждом узле в списке 
 void showinfo()
 {
   Infocollector *p = headcollector;
