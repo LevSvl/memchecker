@@ -2,15 +2,15 @@
 TARGET = build
 RPATH = D:/soft/R/R-4.4.0
 RSCRIPT = ${RPATH}/bin/Rscript
-VIS = D:/projects/Rprojects/vis
-VISSRC = ${VIS}/vis_main.R
+VIS = vis
+VISSRC = vis_main.R
 
 # files
 EXECUTABLE = memchecker
 VISDATAINPUT = ${VIS}/data.csv
 
 # commands
-VISRUNCOMMAND += cd ${VIS} &&  # cmd command to cd to vis dir
+VISRUNCOMMAND += cd ${VIS} &&# cmd command to cd to vis dir
 VISRUNCOMMAND += ${RSCRIPT} ${VISSRC} # and run vis script
 
 # compile
